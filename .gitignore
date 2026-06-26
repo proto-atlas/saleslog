@@ -1,0 +1,11 @@
+# Local secrets
+.env
+.env.*
+**/.env
+**/.env.*
+!.env.example
+!**/.env.example
+
+# Local verification artifacts (point-in-time)
+docs/decisions/checklist-verification-*.md
+
