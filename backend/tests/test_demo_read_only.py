@@ -1,4 +1,4 @@
-"""DEMO_READ_ONLY=true の読み取り専用デモモード検証。
+"""DEMO_READ_ONLY=true の読み取り専用モード検証。
 
 仕様 の指定どおり専用モジュールに分離し、fixture は function スコープの
 monkeypatch.setenv のみを使う（session / module スコープは使わない）。
