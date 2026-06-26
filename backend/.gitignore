@@ -1,0 +1,11 @@
+__pycache__/
+*.egg-info/
+.venv/
+.pytest_cache/
+.env
+.env.*
+!.env.example
+*.sqlite3
+*.db
+# 型生成の中間ファイル（生成物のコミット対象は frontend/src/api/generated/）
+openapi.json

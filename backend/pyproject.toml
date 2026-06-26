@@ -1,0 +1,49 @@
+[build-system]
+requires = ["setuptools>=80"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "saleslog-backend"
+version = "0.1.0"
+description = "Saleslog バックエンド API"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi==0.136.3",
+    "sqlalchemy==2.0.50",
+    "alembic==1.18.4",
+    "pydantic==2.13.4",
+    "uvicorn==0.49.0",
+    "pyjwt[crypto]==2.13.0",
+    "truststore==0.10.4",
+    "httpx==0.28.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest==9.0.3",
+    "ruff==0.15.18",
+    "mypy==2.1.0",
+]
+
+[tool.setuptools]
+packages = ["app"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+exclude = [".venv", "saleslog_backend.egg-info"]
+
+[tool.ruff.lint.per-file-ignores]
+"app/main.py" = ["E402"]
+"tests/conftest.py" = ["E402"]
+
+[tool.mypy]
+python_version = "3.12"
+files = ["app"]
+check_untyped_defs = true
+warn_unused_ignores = true
+warn_return_any = true
+ignore_missing_imports = true
