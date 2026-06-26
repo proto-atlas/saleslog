@@ -1,3 +1,4 @@
+import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -28,6 +29,9 @@ function envPort(name: string, defaultPort: number): number {
 
 export const SEEDED_DB_PATH = path.join(TMP_DIR, 'e2e-seeded.db')
 export const EMPTY_DB_PATH = path.join(TMP_DIR, 'e2e-empty.db')
+
+fs.mkdirSync(TMP_DIR, { recursive: true })
+
 export const SEEDED_DB_URL = sqliteUrl(SEEDED_DB_PATH)
 export const EMPTY_DB_URL = sqliteUrl(EMPTY_DB_PATH)
 
