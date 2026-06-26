@@ -1,0 +1,76 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm run test
+      - run: npm run build
+      - run: npm run build-storybook
+
+  backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+      - run: pip install -e ".[dev]"
+      - run: python -m ruff check .
+      - run: python -m mypy
+      - run: python -m pytest
+      # 生成型が API と一致しているかを再生成 + 差分で検査する
+      - run: python -m app.export_openapi
+      - run: npx -y openapi-typescript@7.13.0 openapi.json -o ../frontend/src/api/generated/schema.d.ts
+      - run: git diff --exit-code -- ../frontend/src/api/generated
+
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: pip install -e ./backend
+      - run: npm ci
+        working-directory: frontend
+      - run: npx playwright install --with-deps chromium
+        working-directory: frontend
+      # サーバ起動・seed 投入は playwright.config.ts の webServer command が行う
+      - run: npm run e2e
+        working-directory: frontend
+        env:
+          E2E_PYTHON: python
+          E2E_UVICORN: uvicorn
