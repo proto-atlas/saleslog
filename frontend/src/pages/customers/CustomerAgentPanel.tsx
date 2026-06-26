@@ -1,3 +1,4 @@
+import { Building2, FileText, UserRound } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useLocation } from 'react-router'
 
@@ -764,7 +765,7 @@ function ApprovalSources({
         <ul className="flex flex-col gap-2">
           {proposalSources.slice(0, 5).map((source) => (
             <li key={source.id} className="flex items-start gap-2 text-[13px] text-slate-700">
-              <span className="mt-0.5 shrink-0 text-base">{sourceTypeIcon(source.source_type)}</span>
+              <SourceTypeIcon sourceType={source.source_type} className="mt-[1px]" />
               <div className="min-w-0">
                 <span className="font-medium">{source.label}</span>
                 <span className="ml-2">
@@ -808,7 +809,7 @@ function SourcesList({
             >
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
-                  <span className="text-base">{sourceTypeIcon(source.source_type)}</span>
+                  <SourceTypeIcon sourceType={source.source_type} />
                   <p className="text-[13px] font-semibold text-slate-800">{source.label}</p>
                 </div>
                 <SourceDetailsToggle source={source} />
@@ -1098,10 +1099,19 @@ function sourceTypeLabel(sourceType: string): string {
   if (sourceType === 'activity') return '活動履歴'
   return '社内ナレッジ'
 }
-function sourceTypeIcon(sourceType: string): string {
-  if (sourceType === 'customer') return '👤'
-  if (sourceType === 'activity') return '📝'
-  return '🏢'
+function SourceTypeIcon({ sourceType, className = '' }: { sourceType: string; className?: string }) {
+  const Icon = sourceType === 'customer'
+    ? UserRound
+    : sourceType === 'activity'
+      ? FileText
+      : Building2
+  return (
+    <Icon
+      aria-hidden="true"
+      className={`h-4 w-4 shrink-0 text-slate-500 ${className}`}
+      strokeWidth={2}
+    />
+  )
 }
 function getSourceOriginalHref(source: AgentRunSourceOut, returnTo: string): string | null {
   if (source.source_type === 'activity') {

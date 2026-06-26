@@ -1,21 +1,22 @@
 import { UserButton } from '@clerk/react'
+import { ChartNoAxesColumnIncreasing, FileText, House, Settings, Users } from 'lucide-react'
 import { NavLink, Outlet } from 'react-router'
 
 import { useMe } from './api/users'
 import { authEnabled } from './auth/authConfig'
 
 const NAV_ITEMS = [
-  { to: '/', label: 'ダッシュボード', icon: '🏠', end: true },
-  { to: '/customers', label: '顧客', icon: '👥', end: false },
-  { to: '/visits', label: '活動記録', icon: '📝', end: false },
-  { to: '/map', label: 'エリア別', icon: '▦', end: false },
+  { to: '/', label: 'ダッシュボード', icon: House, end: true },
+  { to: '/customers', label: '顧客', icon: Users, end: false },
+  { to: '/visits', label: '活動記録', icon: FileText, end: false },
+  { to: '/map', label: 'エリア別', icon: ChartNoAxesColumnIncreasing, end: false },
 ]
 
 export function AppLayout() {
   const me = useMe()
   const navItems =
     me.data?.role === 'manager'
-      ? [...NAV_ITEMS, { to: '/admin/users', label: '管理', icon: '⚙️', end: false }]
+      ? [...NAV_ITEMS, { to: '/admin/users', label: '管理', icon: Settings, end: false }]
       : NAV_ITEMS
 
   return (
@@ -37,7 +38,9 @@ export function AppLayout() {
           <p className="mt-1 px-2.5 pb-1 pt-2 text-[10px] font-semibold uppercase tracking-[0.1em] text-[#B8C4DD]">
             メイン
           </p>
-          {navItems.map((item) => (
+          {navItems.map((item) => {
+            const Icon = item.icon
+            return (
             <NavLink
               key={item.to}
               to={item.to}
@@ -50,12 +53,11 @@ export function AppLayout() {
                 }`
               }
             >
-              <span aria-hidden="true" className="shrink-0 text-[15px] leading-none">
-                {item.icon}
-              </span>
+              <Icon aria-hidden="true" className="h-[15px] w-[15px] shrink-0" strokeWidth={2} />
               {item.label}
             </NavLink>
-          ))}
+            )
+          })}
         </nav>
 
         {/* User */}

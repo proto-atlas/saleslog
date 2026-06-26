@@ -1,3 +1,4 @@
+import { ClipboardList, Users } from 'lucide-react'
 import { Link } from 'react-router'
 
 import { useDashboardSummary } from '../api/dashboard'
@@ -61,7 +62,7 @@ export function DashboardPage() {
                 <p className="text-[11px] font-semibold uppercase tracking-[0.07em] text-slate-600">
                   顧客総数
                 </p>
-                <span className="text-xl">👥</span>
+                <Users aria-hidden="true" className="h-5 w-5 text-slate-500" strokeWidth={2} />
               </div>
               <p className="text-[36px] font-bold leading-none tracking-[-0.02em] text-slate-800">
                 {data.total_customers}
@@ -75,7 +76,7 @@ export function DashboardPage() {
                 <p className="text-[11px] font-semibold uppercase tracking-[0.07em] text-slate-600">
                   今月の活動
                 </p>
-                <span className="text-xl">📋</span>
+                <ClipboardList aria-hidden="true" className="h-5 w-5 text-slate-500" strokeWidth={2} />
               </div>
               <p className="text-[36px] font-bold leading-none tracking-[-0.02em] text-slate-800">
                 {data.visits_this_month}
