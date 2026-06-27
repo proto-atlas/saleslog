@@ -19,7 +19,7 @@ Agentは業務テーブルへ直接書き込まず、`agent_approvals` に書き
 
 ## イベント記録とSSE
 
-SSEには `safe_message_key` と許可済みparamだけを流す。顧客本文、活動本文、ナレッジ本文、メール本文、根拠抜粋、LLMの未加工出力、`lease_token`、`processing_owner` は含めない。
+SSEには `safe_message_key`、許可済みparam、run / event のIDや状態などのイベントメタ情報だけを流す。顧客本文、活動本文、ナレッジ本文、メール本文、根拠抜粋、LLMの未加工出力、`lease_token`、`processing_owner` は含めない。
 
 ## ナレッジ検索
 

@@ -19,7 +19,7 @@ LLM Provider は `AGENT_LLM_PROVIDER` で `mock` / `anthropic` / `openai` を切
 
 ## イベント記録
 
-`agent_events` には `safe_message_key` と許可済みparamだけを保存する。顧客本文、活動本文、ナレッジ本文、モデル入力文、LLMの未加工出力、`lease_token`、`processing_owner` は保存しない。
+`agent_events` には `safe_message_key`、許可済みparam、run / event のIDや状態などのイベントメタ情報だけを保存する。顧客本文、活動本文、ナレッジ本文、モデル入力文、LLMの未加工出力、`lease_token`、`processing_owner` は保存しない。
 
 ## 既知の制約
 
