@@ -20,7 +20,9 @@ Agent進捗は安全なイベントとして表示する。再接続時に重複
 
 ## 検証
 
-- `backend/.venv/Scripts/python.exe -m pytest`: 非整数・負数の `Last-Event-ID` を400、最大値超過を409として確認
+| 方法 | 対象 | 結果 |
+| --- | --- | --- |
+| `backend/.venv/Scripts/python.exe -m pytest` | `Last-Event-ID` の非整数・負数・最大値超過、再接続時のイベント再送 | `docs/verification.md` に backend pytest の通過結果を記録 |
 
 ## 影響
 

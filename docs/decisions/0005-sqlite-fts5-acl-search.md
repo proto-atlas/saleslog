@@ -20,7 +20,9 @@ FTS5検索は `knowledge_chunks_fts`、`knowledge_chunks`、`knowledge_docs` を
 
 ## 検証
 
-- `backend/.venv/Scripts/python.exe -m pytest`: private docが権限外のsalesに返らないことを確認
+| 方法 | 対象 | 結果 |
+| --- | --- | --- |
+| `backend/.venv/Scripts/python.exe -m pytest` | private doc、role別doc、source type、検索時のdoc ACL | `docs/verification.md` に backend pytest の通過結果を記録 |
 
 ## 影響
 

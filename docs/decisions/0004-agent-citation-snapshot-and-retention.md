@@ -20,7 +20,9 @@
 
 ## 検証
 
-- `backend/.venv/Scripts/python.exe -m pytest`: citationの根拠スナップショットを含むartifact作成を確認
+| 方法 | 対象 | 結果 |
+| --- | --- | --- |
+| `backend/.venv/Scripts/python.exe -m pytest` | citationの根拠スナップショット、excerpt保持期限、source ACL再確認 | `docs/verification.md` に backend pytest の通過結果を記録 |
 
 ## 影響
 

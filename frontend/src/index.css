@@ -1,9 +1,5 @@
 @import "tailwindcss";
 
-/*
- * フォント (index.html の <head> に Google Fonts タグを追加してください)
- * <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
- */
 body {
   font-family: 'Inter', 'Hiragino Sans', 'Yu Gothic UI', 'Noto Sans JP', system-ui, -apple-system, sans-serif;
   background-color: #F5F7FA;
