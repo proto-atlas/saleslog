@@ -12,6 +12,7 @@
 | `npm.cmd run build:static-demo` | `VITE_DEMO_MODE=static` のproduction build。API通信を合成データ応答へ差し替えた静的UIデモ | exit 0。Viteのchunk size警告あり |
 | `npm.cmd run build` | 通常のproduction build | exit 0。Viteのchunk size警告あり |
 | Vite preview + Playwright | 静的UIデモの `/` → `/customers` → `/customers/1?tab=agent`、デモバナー表示、Agent提案表示、承認操作 | `static demo ok`。承認トースト「承認して保存しました」を確認 |
+| Cloudflare Pages + Playwright | `https://saleslog-859.pages.dev/`、`/customers`、`/customers/1?tab=agent`、デモバナー表示、Agent提案表示、承認操作 | HTTP 200。Playwrightで承認トースト「承認して保存しました」を確認。ブラウザconsole error 0件 |
 | Playwright screenshot | ダッシュボード、顧客一覧、顧客詳細、Agent承認画面、Agent根拠表示 | `docs/assets/dashboard.png`、`docs/assets/customers.png`、`docs/assets/customer-detail.png`、`docs/assets/customer-agent.png`、`docs/assets/agent-evidence.png` を保存 |
 
 ## 直近確認サマリ（2026-06-26）

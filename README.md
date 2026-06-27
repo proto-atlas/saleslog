@@ -8,11 +8,12 @@
 
 ## 確認方法
 
+- [静的UIデモ](https://saleslog-859.pages.dev/)
 - [操作録画（約42秒）](docs/assets/saleslog-demo.webm)
 - 静的UIデモ用ビルド: `cd frontend && npm run build:static-demo`
 - 検証記録: [docs/verification.md](docs/verification.md)
 
-静的UIデモは、ブラウザで画面遷移と主要UIを確認するためのビルドです。保存、認証、外部LLM実行は行わず、合成データとデモ用応答で動作します。詳細は [静的UIデモ](docs/demo-environment.md) を参照してください。
+静的UIデモは、ブラウザで画面遷移と主要UIを確認するための公開環境です。保存、認証、外部LLM実行は行わず、合成データとデモ用応答で動作します。詳細は [静的UIデモ](docs/demo-environment.md) を参照してください。
 
 通常の動作確認は、ローカル環境のPCブラウザを前提にしています。
 
