@@ -672,7 +672,7 @@ function ApprovalCard({
         />
       </label>
 
-      {/* プレビュー比較 */}
+      {/* 表示比較 */}
       <div className="mb-4 grid gap-3 md:grid-cols-2">
         <PayloadPreview title="元の提案" payload={approval.original_payload_json} />
         <PayloadPreview
