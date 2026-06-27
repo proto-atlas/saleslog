@@ -1,4 +1,9 @@
 import type { components } from './generated/schema'
+import { staticDemoEnabled } from '../demoMode'
+import {
+  handleStaticDemoRequest,
+  handleStaticDemoTextRequest,
+} from './staticDemo'
 
 export type CustomerOut = components['schemas']['CustomerOut']
 export type CustomerListItem = components['schemas']['CustomerListItem']
@@ -112,6 +117,10 @@ async function requestRaw(
   init: RequestInit | undefined,
   defaultHeaders: Record<string, string>,
 ): Promise<Response> {
+  if (staticDemoEnabled) {
+    const demoResponse = handleStaticDemoRequest(path, init)
+    if (demoResponse !== null) return demoResponse
+  }
   const headers: Record<string, string> = { 'Content-Type': 'application/json' }
   for (const [key, value] of Object.entries(defaultHeaders)) {
     headers[key] = value
@@ -130,6 +139,10 @@ async function requestRaw(
 }
 
 async function requestText(path: string, init?: RequestInit): Promise<string> {
+  if (staticDemoEnabled) {
+    const demoText = handleStaticDemoTextRequest(path)
+    if (demoText !== null) return demoText
+  }
   const headers: Record<string, string> = { Accept: 'text/event-stream' }
   if (tokenProvider !== null) {
     const token = await tokenProvider()

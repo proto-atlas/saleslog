@@ -1,12 +1,30 @@
 # Saleslog
 
+![CI](https://github.com/proto-atlas/saleslog/actions/workflows/ci.yml/badge.svg)
+
 外回り営業向けの顧客・活動記録管理アプリ。
 
 顧客マスタと訪問・電話などの活動記録を1か所で扱い、ダッシュボードで「今日の予定」と「入力漏れ（予定日を過ぎたままの記録）」を可視化します。React + TypeScript のフロントエンドと FastAPI バックエンドによるフルスタック構成です。
 
-[操作録画（約42秒）](docs/assets/saleslog-demo.webm)
+## 確認方法
 
-公開デモは用意していません。顧客情報と Agent 実行履歴を扱う業務アプリのため、動作確認はローカル環境のPCブラウザを前提にしています。
+- [操作録画（約42秒）](docs/assets/saleslog-demo.webm)
+- 静的UIデモ用ビルド: `cd frontend && npm run build:static-demo`
+- 検証記録: [docs/verification.md](docs/verification.md)
+
+静的UIデモは、ブラウザで画面遷移と主要UIを確認するためのビルドです。保存、認証、外部LLM実行は行わず、合成データとデモ用応答で動作します。詳細は [静的UIデモ](docs/demo-environment.md) を参照してください。
+
+通常の動作確認は、ローカル環境のPCブラウザを前提にしています。
+
+## 画面
+
+![ダッシュボード](docs/assets/dashboard.png)
+
+![顧客一覧](docs/assets/customers.png)
+
+![顧客詳細](docs/assets/customer-detail.png)
+
+![Agent承認画面](docs/assets/customer-agent.png)
 
 ## 主な機能
 
@@ -18,6 +36,17 @@
 - ユーザー管理画面（manager 限定): メンバーの追加・役割変更・サインインアカウントの紐付けと解除。最後の manager の降格や自分自身の役割変更は拒否します
 - Agent: 顧客詳細から商談準備・フォローアップ・失注リスク確認を実行し、根拠付きの成果物と人間承認後の業務レコード保存を扱います
 - 読み取り専用モード: 環境変数 `DEMO_READ_ONLY=true` で全書き込み API（POST / PATCH / DELETE）を 405 にします。確認用環境でデータを変更させないための設定です
+
+Agent の基本フロー:
+
+```mermaid
+flowchart TD
+  A["顧客情報・活動履歴・社内ナレッジ"] --> B["Agent実行"]
+  B --> C["根拠付き提案"]
+  C --> D["人間が確認・編集・承認"]
+  D --> E["業務レコードへ保存"]
+  C --> F["根拠と主張を保存"]
+```
 
 ## 技術構成
 

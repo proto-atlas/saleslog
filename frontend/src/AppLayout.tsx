@@ -4,6 +4,7 @@ import { NavLink, Outlet } from 'react-router'
 
 import { useMe } from './api/users'
 import { authEnabled } from './auth/authConfig'
+import { staticDemoEnabled } from './demoMode'
 
 const NAV_ITEMS = [
   { to: '/', label: 'ダッシュボード', icon: House, end: true },
@@ -80,6 +81,11 @@ export function AppLayout() {
 
       {/* ── Main ── */}
       <div className="ml-[220px] flex min-h-screen flex-1 flex-col bg-[#F5F7FA]">
+        {staticDemoEnabled && (
+          <div className="border-b border-blue-100 bg-blue-50 px-10 py-2 text-[12px] text-blue-900">
+            静的UIデモです。保存・認証・外部LLM実行は行わず、合成データとデモ用応答で画面遷移を確認できます。
+          </div>
+        )}
         <main className="px-10 py-8">
           <Outlet />
         </main>

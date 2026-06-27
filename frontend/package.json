@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:static-demo": "node scripts/build-static-demo.mjs",
     "lint": "eslint .",
     "typecheck": "tsc -b --noEmit",
     "test": "vitest run --project=unit && vitest run --project=storybook",
