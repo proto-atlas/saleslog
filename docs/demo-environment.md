@@ -29,6 +29,22 @@ npm run build:static-demo
 
 Cloudflare Pages などで公開する場合は、ビルドコマンドに `npm run build:static-demo` を指定し、出力ディレクトリを `frontend/dist` にする。
 
+Wrangler で直接アップロードする場合:
+
+```bash
+cd frontend
+npm run build:static-demo
+npx wrangler pages deploy dist --project-name=saleslog --branch=main
+```
+
+Cloudflare Pages のGit連携を使う場合:
+
+| 項目 | 値 |
+|---|---|
+| Root directory | `frontend` |
+| Build command | `npm run build:static-demo` |
+| Build output directory | `dist` |
+
 ## 通常実行との違い
 
 | 項目 | 通常実行 | 静的UIデモ |
