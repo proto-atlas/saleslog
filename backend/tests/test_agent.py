@@ -2200,6 +2200,7 @@ def test_anthropic_request_body_omits_strict_for_large_schema(customer_factory):
     assert body["tool_choice"] == {
         "type": "tool",
         "name": ANTHROPIC_OUTPUT_TOOL_NAME,
+        "disable_parallel_tool_use": True,
     }
     assert tool["name"] == ANTHROPIC_OUTPUT_TOOL_NAME
     # strict はこのスキーマで "grammar too large" 400 になるため送らない

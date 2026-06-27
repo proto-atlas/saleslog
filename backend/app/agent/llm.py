@@ -378,7 +378,11 @@ def _anthropic_request_body(
                 "input_schema": agent_output_json_schema(),
             }
         ],
-        "tool_choice": {"type": "tool", "name": ANTHROPIC_OUTPUT_TOOL_NAME},
+        "tool_choice": {
+            "type": "tool",
+            "name": ANTHROPIC_OUTPUT_TOOL_NAME,
+            "disable_parallel_tool_use": True,
+        },
     }
     if "temperature" in model_params:
         body["temperature"] = model_params["temperature"]
