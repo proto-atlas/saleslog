@@ -35,10 +35,17 @@ def get_summary(
 ) -> DashboardSummary:
     now = utcnow_naive()
 
-    # sales は自分スコープの集計（customers は owner_id、visits は user_id 基準。仕様）
+    # sales は現在担当顧客に紐づく自分の活動記録だけを集計する
     manager = is_manager(current_user)
     customer_scope = [] if manager else [Customer.owner_id == current_user.id]
-    visit_scope = [] if manager else [Visit.user_id == current_user.id]
+    visit_scope = (
+        []
+        if manager
+        else [
+            Visit.user_id == current_user.id,
+            Visit.customer.has(Customer.owner_id == current_user.id),
+        ]
+    )
 
     total_customers = (
         db.scalar(select(func.count()).select_from(Customer).where(*customer_scope))

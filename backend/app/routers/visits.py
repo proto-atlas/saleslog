@@ -46,7 +46,8 @@ def list_visits(
     if customer_id is not None:
         conditions.append(Visit.customer_id == customer_id)
     if not is_manager(current_user):
-        # sales はクエリの user_id に関わらず自分の記録のみ（サーバ強制。仕様）
+        # sales は現在担当顧客に紐づく自分の記録のみ（サーバ強制。仕様）
+        conditions.append(Customer.owner_id == current_user.id)
         conditions.append(Visit.user_id == current_user.id)
     elif user_id is not None:
         conditions.append(Visit.user_id == user_id)
@@ -70,7 +71,13 @@ def list_visits(
             conditions.append(Visit.visited_at <= to_utc)
 
     total = (
-        db.scalar(select(func.count()).select_from(Visit).where(*conditions)) or 0
+        db.scalar(
+            select(func.count())
+            .select_from(Visit)
+            .join(Customer, Visit.customer_id == Customer.id)
+            .where(*conditions)
+        )
+        or 0
     )
     rows = db.execute(
         select(Visit, Customer.name, Customer.owner_id, User.name)

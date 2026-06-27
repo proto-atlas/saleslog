@@ -33,13 +33,18 @@ def get_customer_authorized(
 
 
 def get_visit_authorized(db: Session, current_user: User, visit_id: int) -> Visit:
-    """活動記録を取得し、sales は自分の記録（user_id = 自分）以外を 404 にする。"""
+    """活動記録を取得し、sales は現在担当顧客の自分の記録以外を 404 にする。"""
     visit = db.get(Visit, visit_id)
     if visit is None:
         raise _not_found()
     db.refresh(visit)
-    if not is_manager(current_user) and visit.user_id != current_user.id:
-        raise _not_found()
+    if not is_manager(current_user):
+        customer = db.get(Customer, visit.customer_id)
+        if customer is None:
+            raise _not_found()
+        db.refresh(customer)
+        if visit.user_id != current_user.id or customer.owner_id != current_user.id:
+            raise _not_found()
     return visit
 
 

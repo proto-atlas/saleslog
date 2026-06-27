@@ -151,6 +151,46 @@ def test_sales_other_users_visit_detail_is_404(
     assert client.delete(f"/api/visits/{others_visit.id}").status_code == 404
 
 
+def test_sales_visit_access_is_revoked_after_customer_reassignment(
+    client: TestClient, db_session: Session, as_sales, two_customers
+):
+    own, _ = two_customers
+    visit = _add_visit(db_session, own.id, user_id=2)
+    own.owner_id = 3
+    db_session.commit()
+    db_session.refresh(own)
+
+    list_res = client.get("/api/visits")
+    assert list_res.status_code == 200
+    assert [item["id"] for item in list_res.json()["items"]] == []
+    assert list_res.json()["total"] == 0
+
+    assert client.get(f"/api/visits/{visit.id}").status_code == 404
+    assert client.patch(f"/api/visits/{visit.id}", json={"status": "done"}).status_code == 404
+    assert client.delete(f"/api/visits/{visit.id}").status_code == 404
+    assert db_session.get(Visit, visit.id) is not None
+
+
+def test_sales_new_owner_does_not_receive_previous_owner_visit_history(
+    client: TestClient, db_session: Session, as_sales, two_customers
+):
+    own, _ = two_customers
+    visit = _add_visit(db_session, own.id, user_id=2)
+    own.owner_id = 3
+    db_session.commit()
+
+    new_owner = db_session.get(User, 3)
+    assert new_owner is not None
+    app.dependency_overrides[get_current_user] = lambda: new_owner
+
+    res = client.get(f"/api/customers/{own.id}/visits")
+    assert res.status_code == 200
+    body = res.json()
+    assert [item["id"] for item in body["items"]] == []
+    assert body["total"] == 0
+    assert client.get(f"/api/visits/{visit.id}").status_code == 404
+
+
 def test_sales_customer_visits_history_is_scoped_to_own(
     client: TestClient, db_session: Session, as_sales, two_customers
 ):
@@ -239,6 +279,29 @@ def test_sales_dashboard_is_scoped(
     assert body["unrecorded_count"] == 1
     # by_owner は自分のみに縮退（仕様）
     assert [entry["owner_id"] for entry in body["by_owner"]] == [2]
+
+
+def test_sales_dashboard_excludes_reassigned_customer_visits(
+    client: TestClient, db_session: Session, as_sales, two_customers
+):
+    own, _ = two_customers
+    now = utcnow_naive()
+    _add_visit(db_session, own.id, user_id=2, visited_at=now - timedelta(days=1))
+    _add_visit(
+        db_session,
+        own.id,
+        user_id=2,
+        status=VisitStatus.planned,
+        visited_at=now,
+    )
+    own.owner_id = 3
+    db_session.commit()
+
+    body = client.get("/api/dashboard/summary").json()
+    assert body["total_customers"] == 0
+    assert body["visits_this_month"] == 0
+    assert body["unrecorded_count"] == 0
+    assert body["today_visits"] == []
 
 
 # --- manager ---
