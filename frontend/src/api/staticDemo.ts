@@ -31,6 +31,9 @@ let nextCustomerId = 6
 let nextVisitId = 8
 let nextUserId = 4
 let nextRunId = 2
+let nextApprovalId = 3
+let nextArtifactId = 2
+let nextSourceId = 4
 
 let users: UsersResponse['items'] = [
   { id: 1, name: '高橋 誠', role: 'manager', linked: true },
@@ -179,7 +182,7 @@ let visits: VisitOut[] = [
 let agentRuns: AgentRunOut[] = [buildAgentRun(1, 1, '次回商談の準備をしたい')]
 let agentApprovals: AgentApprovalOut[] = buildAgentApprovals(1, 1)
 
-const agentArtifacts: AgentArtifactOut[] = [
+let agentArtifacts: AgentArtifactOut[] = [
   {
     id: 1,
     run_id: 1,
@@ -243,7 +246,7 @@ const agentArtifacts: AgentArtifactOut[] = [
   },
 ]
 
-const agentSources: AgentRunSourceOut[] = [
+let agentSources: AgentRunSourceOut[] = [
   {
     id: 1,
     run_id: 1,
@@ -561,6 +564,20 @@ function updateUser(id: number, init?: RequestInit): UserOut {
 function createAgentRun(customerId: number, init?: RequestInit): AgentRunCreateResponse {
   const body = parseBody<AgentRunCreate>(init)
   const run = buildAgentRun(nextRunId, customerId, body.objective, body.workflow_type)
+  agentArtifacts = [buildAgentArtifact(nextArtifactId, run.id), ...agentArtifacts]
+  nextArtifactId += 1
+  const sources = buildAgentSources(run.id).map((source) => {
+    const nextSource = { ...source, id: nextSourceId }
+    nextSourceId += 1
+    return nextSource
+  })
+  agentSources = [...sources, ...agentSources]
+  const approvals = buildAgentApprovals(run.id, customerId).map((approval) => {
+    const nextApproval = { ...approval, id: nextApprovalId }
+    nextApprovalId += 1
+    return nextApproval
+  })
+  agentApprovals = [...approvals, ...agentApprovals]
   agentRuns = [run, ...agentRuns]
   nextRunId += 1
   return { run_id: run.id, status: run.status, reused: false }
@@ -660,6 +677,26 @@ function buildAgentRun(
     created_at: NOW,
     updated_at: NOW,
   }
+}
+
+function buildAgentArtifact(id: number, runId: number): AgentArtifactOut {
+  const baseArtifact = agentArtifacts[0]
+  return {
+    ...baseArtifact,
+    id,
+    run_id: runId,
+    created_at: NOW,
+  }
+}
+
+function buildAgentSources(runId: number): AgentRunSourceOut[] {
+  return agentSources
+    .filter((source) => source.run_id === 1)
+    .map((source) => ({
+      ...source,
+      run_id: runId,
+      created_at: NOW,
+    }))
 }
 
 function buildAgentApprovals(runId: number, customerId: number): AgentApprovalOut[] {
