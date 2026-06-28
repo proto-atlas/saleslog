@@ -8,7 +8,7 @@
 
 ## 確認方法
 
-- [静的UIデモ](https://saleslog-859.pages.dev/)
+- [静的UIデモ](https://saleslog-demo.pages.dev/)
 - [操作録画（約42秒）](docs/assets/saleslog-demo.webm)
 - 静的UIデモ用ビルド: `cd frontend && npm run build:static-demo`
 - 検証記録: [docs/verification.md](docs/verification.md)
