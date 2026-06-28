@@ -22,7 +22,7 @@ Saleslog は顧客情報、活動記録、Agent実行履歴、承認操作を扱
 
 ## 公開URL
 
-https://saleslog-859.pages.dev/
+https://saleslog-demo.pages.dev/
 
 ## ビルド
 
