@@ -23,8 +23,9 @@ import { ErrorState } from '../../components/ErrorState'
 import { CustomerStatusBadge } from '../../components/StatusBadge'
 import { useToast } from '../../components/toastContext'
 import { getAppReferenceTimeMs } from '../../demoMode'
-import { formatDateJst, formatDateTimeJst, startOfJstDayMs } from '../../lib/dates'
+import { formatDateJst, formatDateTimeJst } from '../../lib/dates'
 import { CustomerAgentPanel } from './CustomerAgentPanel'
+import { findNextPlannedVisit } from './nextPlannedVisit'
 
 function NotFoundView() {
   return (
@@ -97,17 +98,7 @@ export function CustomerDetailPage() {
     [visits.data],
   )
   const nextVisit = useMemo(() => {
-    // 基準日（JST）以降の予定を対象にする。当日の未完了予定も「次回」に含める。
-    const dayStartMs = startOfJstDayMs(referenceTime)
-    const upcomingPlanned = visitItems.filter(
-      (item) =>
-        item.status === 'planned' &&
-        new Date(item.visited_at).getTime() >= dayStartMs,
-    )
-    if (upcomingPlanned.length === 0) return null
-    return upcomingPlanned.reduce((nearest, item) =>
-      new Date(item.visited_at) < new Date(nearest.visited_at) ? item : nearest,
-    )
+    return findNextPlannedVisit(visitItems, referenceTime)
   }, [visitItems, referenceTime])
 
   if (customerId === undefined) return <NotFoundView />

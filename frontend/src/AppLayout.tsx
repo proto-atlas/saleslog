@@ -8,8 +8,8 @@ import {
   Users,
   X,
 } from 'lucide-react'
-import { useEffect, useId, useState } from 'react'
-import { NavLink, Outlet, useLocation } from 'react-router'
+import { useCallback, useEffect, useId, useRef, useState, useSyncExternalStore } from 'react'
+import { NavLink, Outlet } from 'react-router'
 
 import { useMe } from './api/users'
 import { authEnabled } from './auth/authConfig'
@@ -22,30 +22,49 @@ const NAV_ITEMS = [
   { to: '/map', label: 'エリア別', icon: ChartNoAxesColumnIncreasing, end: false },
 ]
 
+const DESKTOP_VIEWPORT_QUERY = '(min-width: 768px)'
+
+function subscribeDesktopViewport(onChange: () => void) {
+  const mediaQuery = window.matchMedia(DESKTOP_VIEWPORT_QUERY)
+  mediaQuery.addEventListener('change', onChange)
+  return () => mediaQuery.removeEventListener('change', onChange)
+}
+
+function getDesktopViewportSnapshot() {
+  return window.matchMedia(DESKTOP_VIEWPORT_QUERY).matches
+}
+
 export function AppLayout() {
   const me = useMe()
-  const location = useLocation()
   const navId = useId()
+  const openButtonRef = useRef<HTMLButtonElement>(null)
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
+  const desktopViewport = useSyncExternalStore(
+    subscribeDesktopViewport,
+    getDesktopViewportSnapshot,
+    () => false,
+  )
   const navItems =
     me.data?.role === 'manager'
       ? [...NAV_ITEMS, { to: '/admin/users', label: '管理', icon: Settings, end: false }]
       : NAV_ITEMS
 
-  useEffect(() => {
+  const closeMobileNav = useCallback(() => {
+    if (!mobileNavOpen) return
     setMobileNavOpen(false)
-  }, [location.pathname, location.search])
+    openButtonRef.current?.focus()
+  }, [mobileNavOpen])
 
   useEffect(() => {
     if (!mobileNavOpen) return
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        setMobileNavOpen(false)
+        closeMobileNav()
       }
     }
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-  }, [mobileNavOpen])
+  }, [closeMobileNav, mobileNavOpen])
 
   return (
     <div className="flex min-h-screen">
@@ -54,12 +73,13 @@ export function AppLayout() {
           type="button"
           aria-label="メニューを閉じる"
           className="fixed inset-0 z-30 bg-slate-900/40 md:hidden"
-          onClick={() => setMobileNavOpen(false)}
+          onClick={closeMobileNav}
         />
       )}
 
       <aside
         id={navId}
+        inert={!desktopViewport && !mobileNavOpen}
         className={`fixed inset-y-0 left-0 z-40 flex w-[220px] flex-col bg-[#1E2432] transition-transform duration-200 md:translate-x-0 ${
           mobileNavOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
@@ -77,7 +97,7 @@ export function AppLayout() {
             type="button"
             className="rounded-[6px] p-1.5 text-[#D6DEEF] hover:bg-white/[0.08] md:hidden"
             aria-label="メニューを閉じる"
-            onClick={() => setMobileNavOpen(false)}
+            onClick={closeMobileNav}
           >
             <X aria-hidden="true" className="h-4 w-4" strokeWidth={2} />
           </button>
@@ -94,6 +114,7 @@ export function AppLayout() {
                 key={item.to}
                 to={item.to}
                 end={item.end}
+                onClick={closeMobileNav}
                 className={({ isActive }) =>
                   `flex items-center gap-2.5 rounded-[7px] py-2 text-[13px] font-medium transition-colors duration-100 ${
                     isActive
@@ -129,6 +150,7 @@ export function AppLayout() {
       <div className="flex min-h-screen w-full min-w-0 flex-1 flex-col bg-[#F5F7FA] md:ml-[220px]">
         <div className="flex items-center gap-3 border-b border-slate-200/80 bg-white px-4 py-3 md:hidden">
           <button
+            ref={openButtonRef}
             type="button"
             className="rounded-[7px] border border-slate-200 bg-white p-2 text-slate-700"
             aria-label="メニューを開く"
