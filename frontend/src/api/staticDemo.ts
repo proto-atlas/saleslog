@@ -1,3 +1,4 @@
+import { STATIC_DEMO_CLOCK_ISO } from '../demoMode'
 import type {
   AgentApprovalDecision,
   AgentApprovalDecisionResponse,
@@ -24,7 +25,7 @@ import type {
   VisitsListResponse,
 } from './client'
 
-const NOW = '2026-06-28T09:00:00.000Z'
+const NOW = STATIC_DEMO_CLOCK_ISO
 const TODAY_VISIT_AT = '2026-06-28T04:00:00.000Z'
 
 let nextCustomerId = 6

@@ -22,7 +22,8 @@ import { EmptyState } from '../../components/EmptyState'
 import { ErrorState } from '../../components/ErrorState'
 import { CustomerStatusBadge } from '../../components/StatusBadge'
 import { useToast } from '../../components/toastContext'
-import { formatDateJst, formatDateTimeJst } from '../../lib/dates'
+import { getAppReferenceTimeMs } from '../../demoMode'
+import { formatDateJst, formatDateTimeJst, startOfJstDayMs } from '../../lib/dates'
 import { CustomerAgentPanel } from './CustomerAgentPanel'
 
 function NotFoundView() {
@@ -90,19 +91,21 @@ export function CustomerDetailPage() {
     [setSearchParams],
   )
 
-  const [referenceTime] = useState(() => Date.now())
+  const [referenceTime] = useState(() => getAppReferenceTimeMs())
   const visitItems = useMemo(
     () => (visits.data?.pages ?? []).flatMap((page) => page.items),
     [visits.data],
   )
   const nextVisit = useMemo(() => {
-    const futurePlanned = visitItems.filter(
+    // 基準日（JST）以降の予定を対象にする。当日の未完了予定も「次回」に含める。
+    const dayStartMs = startOfJstDayMs(referenceTime)
+    const upcomingPlanned = visitItems.filter(
       (item) =>
         item.status === 'planned' &&
-        new Date(item.visited_at).getTime() > referenceTime,
+        new Date(item.visited_at).getTime() >= dayStartMs,
     )
-    if (futurePlanned.length === 0) return null
-    return futurePlanned.reduce((nearest, item) =>
+    if (upcomingPlanned.length === 0) return null
+    return upcomingPlanned.reduce((nearest, item) =>
       new Date(item.visited_at) < new Date(nearest.visited_at) ? item : nearest,
     )
   }, [visitItems, referenceTime])
