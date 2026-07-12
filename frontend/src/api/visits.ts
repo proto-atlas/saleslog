@@ -11,6 +11,7 @@ import {
   type VisitCreate,
   type VisitOut,
   type VisitPatch,
+  type VisitListItem,
   type VisitsListResponse,
 } from './client'
 import type { VisitStatus } from './enums'
@@ -21,6 +22,7 @@ export const DETAIL_PAGE_SIZE = 10
 export const visitsKeys = {
   all: ['visits'] as const,
   byCustomer: (customerId: number) => ['visits', 'byCustomer', customerId] as const,
+  nextByCustomer: (customerId: number) => ['visits', 'nextByCustomer', customerId] as const,
   detail: (id: number) => ['visits', 'detail', id] as const,
   list: (params: VisitListApiParams) => ['visits', 'list', params] as const,
 }
@@ -70,6 +72,15 @@ export function useCustomerVisits(customerId: number | undefined) {
       lastPage.page * lastPage.page_size < lastPage.total
         ? lastPage.page + 1
         : undefined,
+    enabled: customerId !== undefined,
+  })
+}
+
+export function useCustomerNextVisit(customerId: number | undefined) {
+  return useQuery({
+    queryKey: visitsKeys.nextByCustomer(customerId ?? -1),
+    queryFn: () =>
+      api.get<VisitListItem | null>(`/api/customers/${customerId}/next-visit`),
     enabled: customerId !== undefined,
   })
 }

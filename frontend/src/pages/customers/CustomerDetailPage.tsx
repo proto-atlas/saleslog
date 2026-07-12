@@ -14,7 +14,7 @@ import {
   type CustomerStatus,
 } from '../../api/enums'
 import { useMe, useUsers } from '../../api/users'
-import { useCustomerVisits } from '../../api/visits'
+import { useCustomerNextVisit, useCustomerVisits } from '../../api/visits'
 import { ActivityTimeline } from '../../components/ActivityTimeline'
 import { Button } from '../../components/Button'
 import { Dialog } from '../../components/Dialog'
@@ -22,10 +22,8 @@ import { EmptyState } from '../../components/EmptyState'
 import { ErrorState } from '../../components/ErrorState'
 import { CustomerStatusBadge } from '../../components/StatusBadge'
 import { useToast } from '../../components/toastContext'
-import { getAppReferenceTimeMs } from '../../demoMode'
 import { formatDateJst, formatDateTimeJst } from '../../lib/dates'
 import { CustomerAgentPanel } from './CustomerAgentPanel'
-import { findNextPlannedVisit } from './nextPlannedVisit'
 
 function NotFoundView() {
   return (
@@ -54,6 +52,7 @@ export function CustomerDetailPage() {
     idParam !== undefined && /^\d+$/.test(idParam) ? Number(idParam) : undefined
   const customer = useCustomer(customerId)
   const visits = useCustomerVisits(customerId)
+  const nextVisit = useCustomerNextVisit(customerId)
   const me = useMe()
   const isManager = me.data?.role === 'manager'
   const users = useUsers({ enabled: isManager })
@@ -92,14 +91,10 @@ export function CustomerDetailPage() {
     [setSearchParams],
   )
 
-  const [referenceTime] = useState(() => getAppReferenceTimeMs())
   const visitItems = useMemo(
     () => (visits.data?.pages ?? []).flatMap((page) => page.items),
     [visits.data],
   )
-  const nextVisit = useMemo(() => {
-    return findNextPlannedVisit(visitItems, referenceTime)
-  }, [visitItems, referenceTime])
 
   if (customerId === undefined) return <NotFoundView />
   if (customer.isPending) {
@@ -225,17 +220,17 @@ export function CustomerDetailPage() {
           <h2 className="mb-4 text-[11px] font-semibold uppercase tracking-[0.07em] text-slate-600">
             次回訪問予定
           </h2>
-          {nextVisit === null ? (
+          {nextVisit.data == null ? (
             <p className="text-sm text-slate-600">予定はありません</p>
           ) : (
             <div className="flex items-start gap-3">
               <div className="mt-0.5 h-9 w-[3px] shrink-0 rounded-full bg-[#1D4ED8]" />
               <div>
                 <p className="text-[15px] font-semibold text-slate-800">
-                  {formatDateTimeJst(nextVisit.visited_at)}
+                  {formatDateTimeJst(nextVisit.data.visited_at)}
                 </p>
                 <p className="mt-1 text-[13px] text-slate-500">
-                  担当: {nextVisit.user_name}
+                  担当: {nextVisit.data.user_name}
                 </p>
               </div>
             </div>

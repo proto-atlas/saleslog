@@ -252,3 +252,42 @@ def list_customer_visits(
         for visit, user_name in rows
     ]
     return ListResponse(items=items, total=total, page=page, page_size=page_size)
+
+
+@router.get("/{customer_id}/next-visit", response_model=VisitListItem | None)
+def get_customer_next_visit(
+    customer_id: int,
+    db: Annotated[Session, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> VisitListItem | None:
+    customer = get_customer_authorized(db, current_user, customer_id)
+    conditions = [
+        Visit.customer_id == customer_id,
+        Visit.status == "planned",
+        Visit.visited_at >= utcnow_naive(),
+    ]
+    if not is_manager(current_user):
+        conditions.append(Visit.user_id == current_user.id)
+    row = db.execute(
+        select(Visit, User.name)
+        .join(User, Visit.user_id == User.id)
+        .where(*conditions)
+        .order_by(Visit.visited_at.asc(), Visit.id.asc())
+        .limit(1)
+    ).one_or_none()
+    if row is None:
+        return None
+    visit, user_name = row
+    return VisitListItem(
+        id=visit.id,
+        customer_id=customer.id,
+        customer_name=customer.name,
+        owner_id=customer.owner_id,
+        user_id=visit.user_id,
+        user_name=user_name,
+        activity_type=visit.activity_type,
+        status=visit.status,
+        visited_at=visit.visited_at,
+        created_at=visit.created_at,
+        updated_at=visit.updated_at,
+    )

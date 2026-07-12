@@ -56,7 +56,7 @@ function renderWithProviders(element: ReactNode) {
   )
 }
 
-function jsonResponse(body: object, status = 200): Response {
+function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
     status,
     headers: { 'Content-Type': 'application/json' },
@@ -82,6 +82,9 @@ describe('sales role UI', () => {
         }
         if (path.startsWith('/api/customers/1/visits')) {
           return jsonResponse({ items: [], total: 0, page: 1, page_size: 10 })
+        }
+        if (path === '/api/customers/1/next-visit') {
+          return jsonResponse(null)
         }
         return jsonResponse({ detail: 'Not Found' }, 404)
       }),

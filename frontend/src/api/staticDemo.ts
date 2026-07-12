@@ -337,6 +337,19 @@ export function handleStaticDemoRequest(
   if (method === 'GET' && customerVisitsMatch !== null) {
     return json(listVisits(url, Number(customerVisitsMatch[1])))
   }
+  const customerNextVisitMatch = pathname.match(/^\/api\/customers\/(\d+)\/next-visit$/)
+  if (method === 'GET' && customerNextVisitMatch !== null) {
+    const customerId = Number(customerNextVisitMatch[1])
+    const nextVisit = visits
+      .filter(
+        (visit) =>
+          visit.customer_id === customerId &&
+          visit.status === 'planned' &&
+          Date.parse(visit.visited_at) >= Date.parse(NOW),
+      )
+      .sort((left, right) => Date.parse(left.visited_at) - Date.parse(right.visited_at))[0]
+    return json(nextVisit === undefined ? null : toVisitListItem(nextVisit))
+  }
 
   if (method === 'GET' && pathname === '/api/visits') return json(listVisits(url))
   if (method === 'POST' && pathname === '/api/visits') return json(createVisit(init), 201)
