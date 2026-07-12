@@ -38,6 +38,8 @@ export function AppLayout() {
   const me = useMe()
   const navId = useId()
   const openButtonRef = useRef<HTMLButtonElement>(null)
+  const closeButtonRef = useRef<HTMLButtonElement>(null)
+  const wasMobileNavOpenRef = useRef(false)
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
   const desktopViewport = useSyncExternalStore(
     subscribeDesktopViewport,
@@ -52,7 +54,18 @@ export function AppLayout() {
   const closeMobileNav = useCallback(() => {
     if (!mobileNavOpen) return
     setMobileNavOpen(false)
-    openButtonRef.current?.focus()
+  }, [mobileNavOpen])
+
+  useEffect(() => {
+    if (mobileNavOpen) {
+      wasMobileNavOpenRef.current = true
+      closeButtonRef.current?.focus()
+      return
+    }
+    if (wasMobileNavOpenRef.current) {
+      wasMobileNavOpenRef.current = false
+      openButtonRef.current?.focus()
+    }
   }, [mobileNavOpen])
 
   useEffect(() => {
@@ -94,6 +107,7 @@ export function AppLayout() {
             </span>
           </div>
           <button
+            ref={closeButtonRef}
             type="button"
             className="rounded-[6px] p-1.5 text-[#D6DEEF] hover:bg-white/[0.08] md:hidden"
             aria-label="メニューを閉じる"
@@ -147,7 +161,10 @@ export function AppLayout() {
         )}
       </aside>
 
-      <div className="flex min-h-screen w-full min-w-0 flex-1 flex-col bg-[#F5F7FA] md:ml-[220px]">
+      <div
+        inert={!desktopViewport && mobileNavOpen}
+        className="flex min-h-screen w-full min-w-0 flex-1 flex-col bg-[#F5F7FA] md:ml-[220px]"
+      >
         <div className="flex items-center gap-3 border-b border-slate-200/80 bg-white px-4 py-3 md:hidden">
           <button
             ref={openButtonRef}
