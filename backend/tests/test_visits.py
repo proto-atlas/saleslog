@@ -238,6 +238,32 @@ def test_customer_visits_unknown_customer_is_404(client: TestClient, base_users)
     assert client.get("/api/customers/999/visits").status_code == 404
 
 
+def test_customer_next_visit_returns_nearest_from_more_than_one_page(
+    client: TestClient, db_session: Session, customer_factory
+):
+    customer = customer_factory(name="次回予定顧客")
+    for day in range(1, 13):
+        _create_visit_row(
+            db_session,
+            customer.id,
+            status=VisitStatus.planned,
+            visited_at=datetime(2099, 5, day, 9, 0, 0),
+        )
+    res = client.get(f"/api/customers/{customer.id}/next-visit")
+    assert res.status_code == 200
+    assert res.json()["visited_at"] == "2099-05-01T09:00:00Z"
+
+
+def test_customer_next_visit_returns_null_without_future_plan(
+    client: TestClient, db_session: Session, customer_factory
+):
+    customer = customer_factory()
+    _create_visit_row(db_session, customer.id, status=VisitStatus.done)
+    res = client.get(f"/api/customers/{customer.id}/next-visit")
+    assert res.status_code == 200
+    assert res.json() is None
+
+
 # --- GET /api/visits（顧客横断一覧） ---
 
 
