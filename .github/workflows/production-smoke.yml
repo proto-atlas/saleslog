@@ -1,0 +1,33 @@
+name: 公開環境確認
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "35 21 * * *"
+
+permissions: {}
+
+jobs:
+  production-smoke:
+    name: 主要画面の応答確認
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    strategy:
+      fail-fast: false
+      matrix:
+        path:
+          - /
+          - /customers
+          - /customers/1?tab=agent
+    steps:
+      - name: 画面を確認
+        env:
+          TARGET_PATH: ${{ matrix.path }}
+        run: |
+          response_file=$(mktemp)
+          status=$(curl --silent --show-error --retry 3 --retry-delay 2 \
+            --output "$response_file" --write-out "%{http_code}" \
+            "https://saleslog-demo.pages.dev${TARGET_PATH}")
+          test "$status" = "200"
+          test -s "$response_file"
+          grep -F "<div id=\"root\"></div>" "$response_file"
